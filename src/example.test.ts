@@ -94,7 +94,7 @@ it('test', async () => {
 
 	orm.em.clear();
 
-	const [[tcr]] = await Promise.all([
+	const [[tcr], priorities] = await Promise.all([
 		testCaseRevisionRepository.createQueryBuilder('t0')
 			.select('*')
 			.innerJoinAndSelect('t0.testCase', 't1', { version: sql`t0.version` })
@@ -105,6 +105,7 @@ it('test', async () => {
 
 	assert.strictEqual(tcr.priority.id, 1);
 	assert.strictEqual(tcr.priority.name, 'draft');
+	assert.ok(tcr.priority === priorities[0]);
 
 	// Works correctly
 	const serialized = serialize(tcr, { populate: ['priority'] });
