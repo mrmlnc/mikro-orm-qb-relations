@@ -13,6 +13,7 @@ import {
 	Rel,
 	wrap,
 	sql,
+	serialize,
 } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/sqlite';
 
@@ -105,10 +106,21 @@ it('test', async () => {
 	assert.strictEqual(tcr.priority.id, 1);
 	assert.strictEqual(tcr.priority.name, 'draft');
 
-	const actual = wrap(tcr).toJSON();
+	// Works correctly
+	const serialized = serialize(tcr, { populate: ['priority'] });
 
-	console.dir(actual, { colors: true, compact: false, depth: 2 });
+	assert.strictEqual(serialized.priority.id, 1);
+	assert.strictEqual(serialized.priority.name, 'draft');
 
-	assert.strictEqual(actual.priority.id, 1);
-	assert.strictEqual(actual.priority.name, 'draft');
+	// Works correctly
+	const pojo = wrap(tcr).toPOJO();
+
+	assert.strictEqual(pojo.priority.id, 1);
+	assert.strictEqual(pojo.priority.name, 'draft');
+
+	// Broken
+	const json = wrap(tcr).toJSON();
+
+	assert.strictEqual(json.priority.id, 1);
+	assert.strictEqual(json.priority.name, 'draft');
 });
